@@ -16,6 +16,7 @@ const playPauseButton = document.getElementById('play-pause-button');
 const gameWrapper = document.querySelector('.game-wrapper');
 const tetrisFlashEffect = document.getElementById('tetris-flash-effect');
 const fireworksContainer = document.getElementById('fireworks-container');
+const newsMarqueeContainer = document.getElementById('news-marquee-container');
 
 /**
  * ゲームの設定
@@ -107,6 +108,7 @@ function init() {
     }
     animate();
     adjustGameScale(); // ゲーム初期化時にスケール調整
+    fetchNews(); // ニュースを取得
 }
 
 /**
@@ -178,8 +180,13 @@ function draw() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     // ボードを描画
     drawBoard();
-    // 現在のピースを描画
+
+    // 現在のピースを描画（明滅効果適用）
+    // Math.sinを使って透明度を滑らかに変化させる
+    const blinkAlpha = (Math.sin(lastTime / 100) + 1) / 2; // 0から1の間で変化
+    context.globalAlpha = 0.5 + (blinkAlpha * 0.5); // 0.5から1.0の間で変化
     drawPiece(currentPiece, context, BLOCK_SIZE);
+    context.globalAlpha = 1.0; // 透明度をリセット
 }
 
 /**
@@ -469,6 +476,66 @@ function updateInfo() {
     scoreElement.textContent = score;
     linesElement.textContent = lines;
     levelElement.textContent = level;
+}
+
+/**
+ * ニュースを取得して表示する関数
+ */
+async function fetchNews() {
+    const RSS_URL = 'https://news.google.com/rss?hl=ja&gl=JP&ceid=JP:ja';
+    const CORS_PROXY = 'https://api.allorigins.win/get?url='; // CORS回避のためのプロキシ
+
+    try {
+        const response = await fetch(CORS_PROXY + encodeURIComponent(RSS_URL));
+        const data = await response.json();
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data.contents, 'text/xml');
+        
+        const items = xmlDoc.querySelectorAll('item');
+        let newsContent = [];
+
+        items.forEach((item, index) => {
+            if (index < 20) { // 最新の20件を取得
+                const title = item.querySelector('title').textContent;
+                const link = item.querySelector('link').textContent;
+                newsContent.push({ title, link });
+            }
+        });
+
+        if (newsContent.length === 0) {
+            newsContent.push({ title: 'ニュースの取得に失敗しました。' });
+        }
+
+        newsMarqueeContainer.innerHTML = ''; // 既存のニュースをクリア
+
+        const numRows = 20; // ニュースの行数
+        const rowHeight = newsMarqueeContainer.offsetHeight / numRows; // 各行の高さ
+
+        for (let i = 0; i < numRows; i++) {
+            const news = newsContent[i % newsContent.length];
+            const newsItem = document.createElement('div');
+            newsItem.classList.add('news-item');
+            const anchor = document.createElement('a');
+            anchor.href = news.link || '#';
+            anchor.textContent = news.title;
+            anchor.target = '_blank';
+            newsItem.appendChild(anchor);
+            newsMarqueeContainer.appendChild(newsItem);
+
+            // 位置とアニメーション速度を設定
+            newsItem.style.top = `${i * rowHeight}px`;
+            const animationDuration = (newsItem.offsetWidth + newsMarqueeContainer.offsetWidth) / 50; // 50px/s の速度を想定
+            newsItem.style.animationDuration = `${animationDuration}s`;
+            newsItem.style.animationDelay = `-${Math.random() * animationDuration}s`; // ランダムな開始位置
+        }
+
+    } catch (error) {
+        console.error('ニュースの取得に失敗しました:', error);
+        const newsItem = document.createElement('div');
+        newsItem.classList.add('news-item');
+        newsItem.textContent = 'ニュースの取得に失敗しました。';
+        newsMarqueeContainer.appendChild(newsItem);
+    }
 }
 
 /**
