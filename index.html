@@ -10,45 +10,54 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <div class="game-container">
-        <div class="main-area">
-            <canvas id="game-canvas"></canvas>
-            <div class="side-panel">
-                <div class="info-box">
-                    <h2>SCORE</h2>
-                    <p id="score">0</p>
-                </div>
-                <div class="info-box">
-                    <h2>LINES</h2>
-                    <p id="lines">0</p>
-                </div>
-                <div class="info-box">
-                    <h2>LEVEL</h2>
-                    <p id="level">1</p>
-                </div>
-                <div class="info-box">
-                    <h2>NEXT</h2>
-                    <canvas id="next-canvas" width="120" height="120"></canvas>
+    <div class="game-wrapper">
+        <div class="game-container">
+            <div class="main-area">
+                <canvas id="game-canvas"></canvas>
+                <div class="side-panel">
+                    <div class="info-box">
+                        <h2>SCORE</h2>
+                        <p id="score">0</p>
+                    </div>
+                    <div class="info-box">
+                        <h2>LINES</h2>
+                        <p id="lines">0</p>
+                    </div>
+                    <div class="info-box">
+                        <h2>LEVEL</h2>
+                        <p id="level">1</p>
+                    </div>
+                    <div class="info-box">
+                        <h2>NEXT</h2>
+                        <canvas id="next-canvas" width="120" height="120"></canvas>
+                    </div>
+                    <div class="audio-controls">
+                        <audio id="bgm" src="midi/BGM.mp3" loop></audio>
+                        <button id="play-pause-button" class="btn">▶</button>
+                        
+                        
+                    </div>
                 </div>
             </div>
+            <div class="controls">
+                <div class="placeholder"></div>
+                <button id="rotate-button" class="btn">⟳</button>
+                <div class="placeholder"></div>
+                <button id="left-button" class="btn">←</button>
+                <button id="down-button" class="btn">↓</button>
+                <button id="right-button" class="btn">→</button>
+                <button id="drop-button" class="btn">DROP</button>
+            </div>
         </div>
-        <div class="controls">
-            <div class="placeholder"></div>
-            <button id="rotate-button" class="btn">⟳</button>
-            <div class="placeholder"></div>
-            <button id="left-button" class="btn">←</button>
-            <button id="down-button" class="btn">↓</button>
-            <button id="right-button" class="btn">→</button>
-            <button id="drop-button" class="btn">DROP</button>
+        
+        <div id="game-over-modal">
+            <div class="game-over-content">
+                <h2>GAME OVER</h2>
+                <button id="restart-button">RESTART</button>
+            </div>
         </div>
-    </div>
-    
-    <div id="game-over-modal">
-        <div class="game-over-content">
-            <h2>GAME OVER</h2>
-            <button id="restart-button">RESTART</button>
-        </div>
+        <div id="tetris-flash-effect"></div>
+        <div id="fireworks-container"></div>
     </div>
 
     <script src="script.js"></script>
