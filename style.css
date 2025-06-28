@@ -9,6 +9,19 @@ body {
     min-height: 100vh;
     margin: 0;
     user-select: none; /* テキスト選択を無効化 */
+    overflow: hidden; /* スクロールバーを非表示 */
+}
+
+/* ゲーム全体を囲むラッパー */
+.game-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100vw; /* ビューポートの幅に合わせる */
+    height: 100vh; /* ビューポートの高さに合わせる */
+    transform-origin: center center;
+    /* JavaScriptでスケールを調整するため、ここでは初期値を設定しない */
 }
 
 /* ゲームコンテナ */
@@ -18,7 +31,9 @@ body {
     align-items: center;
     gap: 20px;
     padding: 20px;
+    box-sizing: border-box; /* パディングを幅に含める */
 }
+
 
 /* メインのゲームエリア */
 .main-area {
@@ -183,5 +198,84 @@ canvas {
     }
     .controls {
         display: none; /* フリック操作に置き換えるため非表示 */
+    }
+}
+
+/* オーディオコントロール */
+.audio-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    background-color: #0f0f18;
+    border: 2px solid #9a9a9a;
+    border-radius: 8px;
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.audio-controls .btn {
+    background-color: #4a4a5e;
+    color: white;
+    border: 2px solid #9a9a9a;
+    border-radius: 5px;
+    padding: 8px 12px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.audio-controls .btn:hover {
+    background-color: #6a6a7e;
+}
+
+/* テトリスフラッシュエフェクト */
+#tetris-flash-effect {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 255, 255, 0.8); /* シアン系の色 */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.1s ease-out, visibility 0s linear 0.1s;
+    z-index: 9999;
+}
+
+#tetris-flash-effect.active {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.1s ease-out;
+}
+
+/* 花火コンテナ */
+#fireworks-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* クリックイベントを透過 */
+    z-index: 9998;
+}
+
+.firework-particle {
+    position: absolute;
+    background-color: white;
+    border-radius: 50%;
+    opacity: 0;
+    animation: firework-burst 0.5s forwards;
+}
+
+@keyframes firework-burst {
+    from {
+        transform: scale(0);
+        opacity: 1;
+    }
+    to {
+        transform: scale(1.5);
+        opacity: 0;
     }
 }

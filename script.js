@@ -10,6 +10,13 @@ const linesElement = document.getElementById('lines');
 const levelElement = document.getElementById('level');
 const gameOverModal = document.getElementById('game-over-modal');
 
+// オーディオ関連の要素
+const bgm = document.getElementById('bgm');
+const playPauseButton = document.getElementById('play-pause-button');
+const gameWrapper = document.querySelector('.game-wrapper');
+const tetrisFlashEffect = document.getElementById('tetris-flash-effect');
+const fireworksContainer = document.getElementById('fireworks-container');
+
 /**
  * ゲームの設定
  */
@@ -99,7 +106,34 @@ function init() {
         cancelAnimationFrame(requestId);
     }
     animate();
+    adjustGameScale(); // ゲーム初期化時にスケール調整
 }
+
+/**
+ * ゲームのスケールを調整する関数
+ */
+function adjustGameScale() {
+    const gameContainer = document.querySelector('.game-container');
+    const gameContainerWidth = gameContainer.offsetWidth;
+    const gameContainerHeight = gameContainer.offsetHeight;
+
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    // 左右に20px、上下に20pxの余白を考慮
+    const scaleX = (windowWidth - 40) / gameContainerWidth;
+    const scaleY = (windowHeight - 40) / gameContainerHeight;
+
+    const scale = Math.min(scaleX, scaleY, 1); // 1より大きくしない
+
+    gameWrapper.style.transform = `scale(${scale})`;
+}
+
+// ウィンドウのリサイズ時にスケールを調整
+window.addEventListener('resize', adjustGameScale);
+
+// 初期ロード時にスケールを調整
+window.addEventListener('load', adjustGameScale);
 
 /**
  * 新しいピースを生成して盤面の上部に配置する
@@ -374,6 +408,11 @@ function removeLines() {
         score += lineScore * level;
         lines += linesCleared;
         
+        // テトリス演出
+        if (linesCleared === 4) {
+            triggerTetrisFlash();
+        }
+
         // レベルアップ
         level = Math.floor(lines / 10) + 1;
         dropInterval = 1000 - (level - 1) * 50;
@@ -381,6 +420,46 @@ function removeLines() {
         
         updateInfo();
     }
+}
+
+/**
+ * テトリス時の派手な演出をトリガーする関数
+ */
+function triggerTetrisFlash() {
+    tetrisFlashEffect.classList.add('active');
+    setTimeout(() => {
+        tetrisFlashEffect.classList.remove('active');
+    }, 200); // 200ms後に非表示
+
+    // 花火を数発生成
+    for (let i = 0; i < 5; i++) { // 5発の花火
+        setTimeout(() => {
+            createFirework();
+        }, i * 100); // 100msごとに花火を生成
+    }
+}
+
+/**
+ * 花火を生成する関数
+ */
+function createFirework() {
+    const particle = document.createElement('div');
+    particle.classList.add('firework-particle');
+
+    // ランダムな位置とサイズ
+    const size = Math.random() * 10 + 5; // 5pxから15px
+    particle.style.width = `${size}px`;
+    particle.style.height = `${size}px`;
+    particle.style.left = `${Math.random() * 100}%`;
+    particle.style.top = `${Math.random() * 100}%`;
+    particle.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 70%)`; // ランダムな色
+
+    fireworksContainer.appendChild(particle);
+
+    // アニメーション終了後に要素を削除
+    particle.addEventListener('animationend', () => {
+        particle.remove();
+    });
 }
 
 /**
@@ -443,6 +522,29 @@ document.getElementById('down-button').addEventListener('click', movePieceDown);
 document.getElementById('rotate-button').addEventListener('click', rotatePiece);
 document.getElementById('drop-button').addEventListener('click', hardDrop);
 document.getElementById('restart-button').addEventListener('click', init);
+
+// BGMコントロールのイベントリスナー
+playPauseButton.addEventListener('click', () => {
+    if (bgm.paused) {
+        bgm.play();
+        playPauseButton.textContent = '⏸';
+    } else {
+        bgm.pause();
+        playPauseButton.textContent = '▶';
+    }
+});
+
+
+    
+
+
+
+// ゲーム開始時にBGMを再生
+bgm.volume = 0.2; // 初期音量を小さめに設定
+bgm.play().catch(error => {
+    console.log("BGMの自動再生に失敗しました。ユーザーの操作が必要です。", error);
+    playPauseButton.textContent = '▶'; // 再生ボタンを再生状態にする
+});
 
 // Touch event variables
 let startX, startY;
