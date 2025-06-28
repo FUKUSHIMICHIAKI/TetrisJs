@@ -182,11 +182,6 @@ canvas {
         flex: 1;
     }
     .controls {
-        display: grid;
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 100;
+        display: none; /* フリック操作に置き換えるため非表示 */
     }
 }
