@@ -37,8 +37,8 @@ body {
 
 /* メインのゲームエリア */
 .main-area {
+    position: relative; /* ニュースマーキーの基準位置 */
     display: flex;
-    flex-wrap: wrap;
     justify-content: center;
     gap: 20px;
 }
@@ -47,8 +47,9 @@ body {
 canvas {
     border: 4px solid #9a9a9a;
     border-radius: 8px;
-    background-color: #0f0f18;
+    background-color: rgba(15, 15, 24, 0.7); /* 半透明にする */
     box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    z-index: 2; /* ニュースマーキーより前面に */
 }
 
 /* サイドパネル（スコアなど） */
@@ -279,3 +280,43 @@ canvas {
         opacity: 0;
     }
 }
+
+/* ニュースマーキーコンテナ */
+#news-marquee-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%; /* main-area全体を覆う */
+    overflow: hidden;
+    pointer-events: none; /* クリックイベントを透過 */
+    z-index: 3; /* ゲームボードより前面 */
+}
+
+.news-item {
+    position: absolute; /* コンテナ内で絶対配置 */
+    white-space: nowrap; /* 折り返しを防ぐ */
+    padding: 5px 15px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    font-size: 1.2em;
+    border-radius: 5px;
+    animation: marquee-scroll linear infinite;
+    /* animation-duration and top will be set by JS */
+}
+
+.news-item a {
+    color: inherit;
+    text-decoration: none;
+}
+
+@keyframes marquee-scroll {
+    from {
+        transform: translateX(100%); /* 画面右端から開始 */
+    }
+    to {
+        transform: translateX(-100%); /* 自身の幅分左に移動 */
+    }
+}
+
+
