@@ -444,5 +444,49 @@ document.getElementById('rotate-button').addEventListener('click', rotatePiece);
 document.getElementById('drop-button').addEventListener('click', hardDrop);
 document.getElementById('restart-button').addEventListener('click', init);
 
+// Touch event variables
+let startX, startY;
+const SWIPE_THRESHOLD = 50; // Minimum distance for a swipe
+const TAP_THRESHOLD = 10; // Maximum distance for a tap
+
+canvas.addEventListener('touchstart', e => {
+    if (gameOver) return;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    e.preventDefault(); // Prevent scrolling
+}, { passive: false });
+
+canvas.addEventListener('touchend', e => {
+    if (gameOver) return;
+    const endX = e.changedTouches[0].clientX;
+    const endY = e.changedTouches[0].clientY;
+
+    const diffX = endX - startX;
+    const diffY = endY - startY;
+
+    if (Math.abs(diffX) > Math.abs(diffY)) { // Horizontal swipe
+        if (Math.abs(diffX) > SWIPE_THRESHOLD) {
+            if (diffX > 0) {
+                movePieceRight();
+            } else {
+                movePieceLeft();
+            }
+        }
+    } else { // Vertical swipe or tap
+        if (Math.abs(diffY) > SWIPE_THRESHOLD) {
+            if (diffY > 0) {
+                movePieceDown();
+                score += 1; // Soft drop bonus
+                updateInfo();
+            } else {
+                rotatePiece(); // Upward swipe to rotate
+            }
+        } else if (Math.abs(diffX) < TAP_THRESHOLD && Math.abs(diffY) < TAP_THRESHOLD) {
+            // This is a tap, consider it a hard drop
+            hardDrop();
+        }
+    }
+}, { passive: false });
+
 // ゲーム開始
 init();
